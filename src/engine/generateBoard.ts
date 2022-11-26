@@ -10,23 +10,30 @@ export enum CellType {
   Touching,
 }
 
-interface EmptyCell {
+interface BaseCell {
+  columnIndex: number;
+  rowIndex: number;
+  visible: boolean;
+}
+
+interface EmptyCell extends BaseCell {
   type: CellType.Empty;
 }
 
-interface MineCell {
+interface MineCell extends BaseCell {
   type: CellType.Mine;
 }
 
-interface TouchingCell {
+interface TouchingCell extends BaseCell {
   type: CellType.Touching;
   numberOfTouchingMines: number;
 }
 
 type Cell = EmptyCell | MineCell | TouchingCell;
+export type Board = Cell[][];
 
 export const generateBoard = () => {
-  const emptyBoard: Cell[][] = generateEmptyBoard();
+  const emptyBoard: Board = generateEmptyBoard();
   const boardWithMines = placeMines(emptyBoard);
   const board = calculateTouchingCells(boardWithMines);
 
@@ -34,13 +41,18 @@ export const generateBoard = () => {
 };
 
 function generateEmptyBoard() {
-  const emptyBoard: Cell[][] = [];
+  const emptyBoard: Board = [];
 
   for (let i = 0; i < MAX_COLUMNS; i++) {
     const row: Cell[] = [];
 
     for (let j = 0; j < MAX_ROWS; j++) {
-      row.push({ type: CellType.Empty });
+      row.push({
+        columnIndex: i,
+        rowIndex: j,
+        type: CellType.Empty,
+        visible: false,
+      });
     }
     emptyBoard.push(row);
   }
@@ -48,7 +60,7 @@ function generateEmptyBoard() {
   return emptyBoard;
 }
 
-function placeMines(emptyBoard: Cell[][]) {
+function placeMines(emptyBoard: Board) {
   const board = cloneDeep(emptyBoard);
 
   let remainingMines = MAX_NUMBER_OF_MINES;
@@ -77,7 +89,7 @@ function getRandomCellIndex() {
   };
 }
 
-function calculateTouchingCells(boardWithMines: Cell[][]) {
+function calculateTouchingCells(boardWithMines: Board) {
   const board = cloneDeep(boardWithMines);
 
   for (let i = 0; i < MAX_COLUMNS; i++) {
@@ -103,7 +115,10 @@ function calculateTouchingCells(boardWithMines: Cell[][]) {
       if (isMine(i + 1, j + 1, board)) touching++;
 
       if (touching > 0) {
+        const cell = board[i][j];
+
         board[i][j] = {
+          ...cell,
           type: CellType.Touching,
           numberOfTouchingMines: touching,
         };
@@ -114,7 +129,7 @@ function calculateTouchingCells(boardWithMines: Cell[][]) {
   return board;
 }
 
-function isMine(colIndex: number, rowIndex: number, board: Cell[][]) {
+function isMine(colIndex: number, rowIndex: number, board: Board) {
   if (colIndex < 0 || colIndex >= MAX_COLUMNS) {
     return false;
   }

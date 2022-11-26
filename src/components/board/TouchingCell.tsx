@@ -1,11 +1,30 @@
 /** @jsxImportSource @emotion/react */
 
+import HiddenCell from "./HiddenCell";
+import { useDispatch } from "react-redux";
+import { selectTouchingCell } from "../../engine/gameSlice";
+
 interface Props {
+  columnIndex: number;
+  rowIndex: number;
+  visible: boolean;
   numberOfTouchingMines: number;
 }
 
 const TouchingCell: React.FC<Props> = (props) => {
-  const { numberOfTouchingMines } = props;
+  const { columnIndex, rowIndex, visible, numberOfTouchingMines } = props;
+
+  const dispatch = useDispatch();
+
+  if (!visible) {
+    return (
+      <HiddenCell
+        onClick={() => {
+          dispatch(selectTouchingCell({ columnIndex, rowIndex }));
+        }}
+      />
+    );
+  }
 
   return (
     <div
@@ -15,9 +34,6 @@ const TouchingCell: React.FC<Props> = (props) => {
         justifyContent: "space-around",
         background: "#D5D2CE",
         borderRadius: "2px",
-      }}
-      onClick={() => {
-        console.log("TOUCHING!!!!!");
       }}
     >
       {numberOfTouchingMines}

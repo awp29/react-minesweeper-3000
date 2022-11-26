@@ -1,10 +1,12 @@
 /** @jsxImportSource @emotion/react */
 
 import { Board, EmptyCell, MineCell, TouchingCell } from "./components/board";
-import { CellType, generateBoard } from "./engine/generateBoard";
+import { CellType } from "./engine/generateBoard";
+import { useSelector } from "react-redux";
+import { RootState } from "./store";
 
 function App() {
-  const board = generateBoard();
+  const board = useSelector((state: RootState) => state.game.board);
   const cells = board.flat();
 
   return (
@@ -17,18 +19,13 @@ function App() {
         {cells.map((cell, index) => {
           switch (cell.type) {
             case CellType.Mine:
-              return <MineCell key={`mine-cell-${index}`} />;
+              return <MineCell key={`mine-cell-${index}`} {...cell} />;
 
             case CellType.Touching:
-              return (
-                <TouchingCell
-                  key={`touching-cell-${index}`}
-                  numberOfTouchingMines={cell.numberOfTouchingMines}
-                />
-              );
+              return <TouchingCell key={`touching-cell-${index}`} {...cell} />;
 
             default:
-              return <EmptyCell key={`empty-cell-${index}`} />;
+              return <EmptyCell key={`empty-cell-${index}`} {...cell} />;
           }
         })}
       </Board>

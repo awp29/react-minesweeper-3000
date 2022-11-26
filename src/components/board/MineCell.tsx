@@ -1,6 +1,30 @@
 /** @jsxImportSource @emotion/react */
 
-const EmptyCell: React.FC = () => {
+import HiddenCell from "./HiddenCell";
+import { useDispatch } from "react-redux";
+import { selectMineCell } from "../../engine/gameSlice";
+
+interface Props {
+  columnIndex: number;
+  rowIndex: number;
+  visible: boolean;
+}
+
+const EmptyCell: React.FC<Props> = (props) => {
+  const { columnIndex, rowIndex, visible } = props;
+
+  const dispatch = useDispatch();
+
+  if (!visible) {
+    return (
+      <HiddenCell
+        onClick={() => {
+          dispatch(selectMineCell({ columnIndex, rowIndex }));
+        }}
+      />
+    );
+  }
+
   return (
     <div
       css={{
@@ -10,9 +34,6 @@ const EmptyCell: React.FC = () => {
         background: "#D5D2CE",
         borderRadius: "2px",
         fontWeight: "bold",
-      }}
-      onClick={() => {
-        console.log("BOOOOOOOM!!!!!");
       }}
     >
       M
