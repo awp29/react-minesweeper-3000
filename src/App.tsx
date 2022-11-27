@@ -1,13 +1,18 @@
 /** @jsxImportSource @emotion/react */
 
 import { Board, EmptyCell, MineCell, TouchingCell } from "./components/board";
-import { CellType } from "./engine/generateBoard";
+import { CellType, NUMBER_OF_FLAGS } from "./engine/generateBoard";
 import { useSelector } from "react-redux";
 import { RootState } from "./store";
+import { selectNumberOfFlaggedCells } from "./engine/selectors";
 
 function App() {
-  const board = useSelector((state: RootState) => state.game.board);
-  const playState = useSelector((state: RootState) => state.game.gameState);
+  const board = useSelector((state: RootState) => state.minesweeper.board);
+  const playState = useSelector(
+    (state: RootState) => state.minesweeper.gameState
+  );
+  const flaggedCells = useSelector(selectNumberOfFlaggedCells);
+
   const cells = board.flat();
 
   return (
@@ -17,6 +22,7 @@ function App() {
       <h1>RM 3000</h1>
 
       <p>Play State: {playState}</p>
+      <p>Flags: {NUMBER_OF_FLAGS - flaggedCells}</p>
 
       <Board>
         {cells.map((cell, index) => {

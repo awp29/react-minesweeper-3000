@@ -18,6 +18,8 @@ const EmptyCell: React.FC<Props> = (props) => {
   if (!visible) {
     return (
       <HiddenCell
+        columnIndex={columnIndex}
+        rowIndex={rowIndex}
         onClick={() => {
           dispatch(selectEmptyCell({ columnIndex, rowIndex }));
         }}

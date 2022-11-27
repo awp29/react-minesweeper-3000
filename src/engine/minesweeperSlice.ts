@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   Board,
+  Cell,
   CellType,
   generateBoard,
   MAX_COLUMNS,
@@ -36,6 +37,13 @@ export const minesweeperSlice = createSlice({
     selectEmptyCell: (state, action: PayloadAction<CellIndex>) => {
       const { columnIndex, rowIndex } = action.payload;
       revealEmptyCells(columnIndex, rowIndex, state.board);
+      state.gameState = updateGameState(state.board);
+    },
+
+    selectTouchingCell: (state, action: PayloadAction<CellIndex>) => {
+      const { columnIndex, rowIndex } = action.payload;
+      state.board[columnIndex][rowIndex].visible = true;
+      state.gameState = updateGameState(state.board);
     },
 
     selectMineCell: (state, action: PayloadAction<CellIndex>) => {
@@ -44,14 +52,15 @@ export const minesweeperSlice = createSlice({
       state.gameState = GameState.GameOver;
     },
 
-    selectTouchingCell: (state, action: PayloadAction<CellIndex>) => {
+    flagCell: (state, action: PayloadAction<CellIndex>) => {
       const { columnIndex, rowIndex } = action.payload;
-      state.board[columnIndex][rowIndex].visible = true;
+      const cell = state.board[columnIndex][rowIndex];
+      cell.flagged = !cell.flagged;
     },
   },
 });
 
-export const { selectEmptyCell, selectMineCell, selectTouchingCell } =
+export const { selectEmptyCell, selectMineCell, selectTouchingCell, flagCell } =
   minesweeperSlice.actions;
 
 export default minesweeperSlice.reducer;
@@ -94,4 +103,18 @@ function revealEmptyCells(columnIndex: number, rowIndex: number, board: Board) {
   revealEmptyCells(columnIndex - 1, rowIndex + 1, board);
   revealEmptyCells(columnIndex, rowIndex + 1, board);
   revealEmptyCells(columnIndex + 1, rowIndex + 1, board);
+}
+
+function updateGameState(board: Board) {
+  const cells = board.flat();
+  const hiddenCells = cells.filter((cell) => !cell.visible);
+
+  if (everyHiddenCellIsMine(hiddenCells)) {
+    return GameState.Won;
+  }
+  return GameState.Active;
+}
+
+function everyHiddenCellIsMine(hiddenCells: Cell[]) {
+  return hiddenCells.every((cell) => cell.type === CellType.Mine);
 }

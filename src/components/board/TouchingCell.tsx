@@ -19,6 +19,8 @@ const TouchingCell: React.FC<Props> = (props) => {
   if (!visible) {
     return (
       <HiddenCell
+        columnIndex={columnIndex}
+        rowIndex={rowIndex}
         onClick={() => {
           dispatch(selectTouchingCell({ columnIndex, rowIndex }));
         }}

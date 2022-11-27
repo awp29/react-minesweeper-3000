@@ -3,6 +3,7 @@ import { cloneDeep } from "lodash";
 export const MAX_ROWS = 10;
 export const MAX_COLUMNS = 10;
 const MAX_NUMBER_OF_MINES = 10;
+export const NUMBER_OF_FLAGS = 10;
 
 export enum CellType {
   Empty,
@@ -14,6 +15,7 @@ interface BaseCell {
   columnIndex: number;
   rowIndex: number;
   visible: boolean;
+  flagged: boolean;
 }
 
 interface EmptyCell extends BaseCell {
@@ -29,7 +31,7 @@ interface TouchingCell extends BaseCell {
   numberOfTouchingMines: number;
 }
 
-type Cell = EmptyCell | MineCell | TouchingCell;
+export type Cell = EmptyCell | MineCell | TouchingCell;
 export type Board = Cell[][];
 
 export const generateBoard = () => {
@@ -52,6 +54,7 @@ function generateEmptyBoard() {
         rowIndex: j,
         type: CellType.Empty,
         visible: false,
+        flagged: false,
       });
     }
     emptyBoard.push(row);
@@ -67,9 +70,8 @@ function placeMines(emptyBoard: Board) {
   while (remainingMines > 0) {
     let randomCellIndex = getRandomCellIndex();
 
-    if (
-      isMine(randomCellIndex.colIndex, randomCellIndex.rowIndex, emptyBoard)
-    ) {
+    if (isMine(randomCellIndex.colIndex, randomCellIndex.rowIndex, board)) {
+      console.log("continue");
       continue;
     }
 
@@ -99,7 +101,6 @@ function calculateTouchingCells(boardWithMines: Board) {
       }
 
       let touching = 0;
-      // check neighbours
       // check cells above
       if (isMine(i - 1, j - 1, board)) touching++;
       if (isMine(i, j - 1, board)) touching++;

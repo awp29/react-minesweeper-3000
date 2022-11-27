@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import minesweeperReducer from "./engine/minesweeperSlice";
 
 export const store = configureStore({
-  reducer: { game: minesweeperReducer },
+  reducer: { minesweeper: minesweeperReducer },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
