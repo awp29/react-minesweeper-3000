@@ -1,9 +1,5 @@
 import { cloneDeep } from "lodash";
-
-export const MAX_ROWS = 10;
-export const MAX_COLUMNS = 10;
-const MAX_NUMBER_OF_MINES = 10;
-export const NUMBER_OF_FLAGS = 10;
+import { Difficulty, getDifficultyConfig } from "./difficulty";
 
 export enum CellType {
   Empty,
@@ -34,21 +30,22 @@ interface TouchingCell extends BaseCell {
 export type Cell = EmptyCell | MineCell | TouchingCell;
 export type Board = Cell[][];
 
-export const generateBoard = () => {
-  const emptyBoard: Board = generateEmptyBoard();
-  const boardWithMines = placeMines(emptyBoard);
-  const board = calculateTouchingCells(boardWithMines);
+export const generateBoard = (difficulty: Difficulty) => {
+  const emptyBoard: Board = generateEmptyBoard(difficulty);
+  const boardWithMines = placeMines(emptyBoard, difficulty);
+  const board = calculateTouchingCells(boardWithMines, difficulty);
 
   return board;
 };
 
-function generateEmptyBoard() {
+function generateEmptyBoard(difficulty: Difficulty) {
+  const difficultyConfig = getDifficultyConfig(difficulty);
   const emptyBoard: Board = [];
 
-  for (let i = 0; i < MAX_COLUMNS; i++) {
+  for (let i = 0; i < difficultyConfig.maxColumns; i++) {
     const row: Cell[] = [];
 
-    for (let j = 0; j < MAX_ROWS; j++) {
+    for (let j = 0; j < difficultyConfig.maxRows; j++) {
       row.push({
         columnIndex: i,
         rowIndex: j,
@@ -63,15 +60,22 @@ function generateEmptyBoard() {
   return emptyBoard;
 }
 
-function placeMines(emptyBoard: Board) {
+function placeMines(emptyBoard: Board, difficulty: Difficulty) {
+  const difficultyConfig = getDifficultyConfig(difficulty);
   const board = cloneDeep(emptyBoard);
 
-  let remainingMines = MAX_NUMBER_OF_MINES;
+  let remainingMines = difficultyConfig.maxMines;
   while (remainingMines > 0) {
-    let randomCellIndex = getRandomCellIndex();
+    let randomCellIndex = getRandomCellIndex(difficulty);
 
-    if (isMine(randomCellIndex.colIndex, randomCellIndex.rowIndex, board)) {
-      console.log("continue");
+    if (
+      isMine(
+        randomCellIndex.colIndex,
+        randomCellIndex.rowIndex,
+        board,
+        difficulty
+      )
+    ) {
       continue;
     }
 
@@ -84,36 +88,39 @@ function placeMines(emptyBoard: Board) {
   return board;
 }
 
-function getRandomCellIndex() {
+function getRandomCellIndex(difficulty: Difficulty) {
+  const difficultyConfig = getDifficultyConfig(difficulty);
+
   return {
-    colIndex: Math.floor(Math.random() * MAX_COLUMNS),
-    rowIndex: Math.floor(Math.random() * MAX_ROWS),
+    colIndex: Math.floor(Math.random() * difficultyConfig.maxColumns),
+    rowIndex: Math.floor(Math.random() * difficultyConfig.maxRows),
   };
 }
 
-function calculateTouchingCells(boardWithMines: Board) {
+function calculateTouchingCells(boardWithMines: Board, difficulty: Difficulty) {
+  const difficultyConfig = getDifficultyConfig(difficulty);
   const board = cloneDeep(boardWithMines);
 
-  for (let i = 0; i < MAX_COLUMNS; i++) {
-    for (let j = 0; j < MAX_ROWS; j++) {
-      if (isMine(i, j, board)) {
+  for (let i = 0; i < difficultyConfig.maxColumns; i++) {
+    for (let j = 0; j < difficultyConfig.maxRows; j++) {
+      if (isMine(i, j, board, difficulty)) {
         continue;
       }
 
       let touching = 0;
       // check cells above
-      if (isMine(i - 1, j - 1, board)) touching++;
-      if (isMine(i, j - 1, board)) touching++;
-      if (isMine(i + 1, j - 1, board)) touching++;
+      if (isMine(i - 1, j - 1, board, difficulty)) touching++;
+      if (isMine(i, j - 1, board, difficulty)) touching++;
+      if (isMine(i + 1, j - 1, board, difficulty)) touching++;
 
       // check cells adjacent
-      if (isMine(i - 1, j, board)) touching++;
-      if (isMine(i + 1, j, board)) touching++;
+      if (isMine(i - 1, j, board, difficulty)) touching++;
+      if (isMine(i + 1, j, board, difficulty)) touching++;
 
       // check cells below
-      if (isMine(i - 1, j + 1, board)) touching++;
-      if (isMine(i, j + 1, board)) touching++;
-      if (isMine(i + 1, j + 1, board)) touching++;
+      if (isMine(i - 1, j + 1, board, difficulty)) touching++;
+      if (isMine(i, j + 1, board, difficulty)) touching++;
+      if (isMine(i + 1, j + 1, board, difficulty)) touching++;
 
       if (touching > 0) {
         const cell = board[i][j];
@@ -130,12 +137,19 @@ function calculateTouchingCells(boardWithMines: Board) {
   return board;
 }
 
-function isMine(colIndex: number, rowIndex: number, board: Board) {
-  if (colIndex < 0 || colIndex >= MAX_COLUMNS) {
+function isMine(
+  colIndex: number,
+  rowIndex: number,
+  board: Board,
+  difficulty: Difficulty
+) {
+  const difficultyConfig = getDifficultyConfig(difficulty);
+
+  if (colIndex < 0 || colIndex >= difficultyConfig.maxColumns) {
     return false;
   }
 
-  if (rowIndex < 0 || rowIndex >= MAX_ROWS) {
+  if (rowIndex < 0 || rowIndex >= difficultyConfig.maxRows) {
     return false;
   }
 

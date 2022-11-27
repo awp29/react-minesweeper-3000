@@ -1,13 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  Board,
-  Cell,
-  CellType,
-  generateBoard,
-  MAX_COLUMNS,
-  MAX_ROWS,
-} from "./generateBoard";
+import { Board, Cell, CellType, generateBoard } from "./generateBoard";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { Difficulty, getDifficultyConfig } from "./difficulty";
 
 interface CellIndex {
   columnIndex: number;
@@ -23,20 +17,29 @@ enum GameState {
 export interface MinesweeperState {
   board: Board;
   gameState: GameState;
+  difficulty: Difficulty;
 }
 
 const initialState: MinesweeperState = {
-  board: generateBoard(),
+  board: generateBoard(Difficulty.Easy),
   gameState: GameState.Active,
+  difficulty: Difficulty.Easy,
 };
 
 export const minesweeperSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
+    selectDifficulty: (state, action: PayloadAction<number>) => {
+      const difficulty = action.payload;
+      state.difficulty = difficulty;
+      state.board = generateBoard(difficulty);
+      state.gameState = GameState.Active;
+    },
+
     selectEmptyCell: (state, action: PayloadAction<CellIndex>) => {
       const { columnIndex, rowIndex } = action.payload;
-      revealEmptyCells(columnIndex, rowIndex, state.board);
+      revealEmptyCells(columnIndex, rowIndex, state.board, state.difficulty);
       state.gameState = updateGameState(state.board);
     },
 
@@ -60,17 +63,29 @@ export const minesweeperSlice = createSlice({
   },
 });
 
-export const { selectEmptyCell, selectMineCell, selectTouchingCell, flagCell } =
-  minesweeperSlice.actions;
+export const {
+  selectEmptyCell,
+  selectMineCell,
+  selectTouchingCell,
+  flagCell,
+  selectDifficulty,
+} = minesweeperSlice.actions;
 
 export default minesweeperSlice.reducer;
 
-function revealEmptyCells(columnIndex: number, rowIndex: number, board: Board) {
-  if (columnIndex < 0 || columnIndex >= MAX_COLUMNS) {
+function revealEmptyCells(
+  columnIndex: number,
+  rowIndex: number,
+  board: Board,
+  difficulty: Difficulty
+) {
+  const difficultyConfig = getDifficultyConfig(difficulty);
+
+  if (columnIndex < 0 || columnIndex >= difficultyConfig.maxColumns) {
     return;
   }
 
-  if (rowIndex < 0 || rowIndex >= MAX_ROWS) {
+  if (rowIndex < 0 || rowIndex >= difficultyConfig.maxRows) {
     return;
   }
 
@@ -91,18 +106,18 @@ function revealEmptyCells(columnIndex: number, rowIndex: number, board: Board) {
   cell.visible = true;
 
   // check cells above
-  revealEmptyCells(columnIndex - 1, rowIndex - 1, board);
-  revealEmptyCells(columnIndex, rowIndex - 1, board);
-  revealEmptyCells(columnIndex + 1, rowIndex - 1, board);
+  revealEmptyCells(columnIndex - 1, rowIndex - 1, board, difficulty);
+  revealEmptyCells(columnIndex, rowIndex - 1, board, difficulty);
+  revealEmptyCells(columnIndex + 1, rowIndex - 1, board, difficulty);
 
   // check middle cells
-  revealEmptyCells(columnIndex - 1, rowIndex, board);
-  revealEmptyCells(columnIndex + 1, rowIndex, board);
+  revealEmptyCells(columnIndex - 1, rowIndex, board, difficulty);
+  revealEmptyCells(columnIndex + 1, rowIndex, board, difficulty);
 
   // check cells below
-  revealEmptyCells(columnIndex - 1, rowIndex + 1, board);
-  revealEmptyCells(columnIndex, rowIndex + 1, board);
-  revealEmptyCells(columnIndex + 1, rowIndex + 1, board);
+  revealEmptyCells(columnIndex - 1, rowIndex + 1, board, difficulty);
+  revealEmptyCells(columnIndex, rowIndex + 1, board, difficulty);
+  revealEmptyCells(columnIndex + 1, rowIndex + 1, board, difficulty);
 }
 
 function updateGameState(board: Board) {
