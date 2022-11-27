@@ -1,7 +1,7 @@
 import { cloneDeep } from "lodash";
 
-const MAX_ROWS = 10;
-const MAX_COLUMNS = 10;
+export const MAX_ROWS = 10;
+export const MAX_COLUMNS = 10;
 const MAX_NUMBER_OF_MINES = 10;
 
 export enum CellType {

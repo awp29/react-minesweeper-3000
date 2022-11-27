@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
-import gameReducer from "./engine/gameSlice";
+import minesweeperReducer from "./engine/minesweeperSlice";
 
 export const store = configureStore({
-  reducer: { game: gameReducer },
+  reducer: { game: minesweeperReducer },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

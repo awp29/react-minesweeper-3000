@@ -2,7 +2,7 @@
 
 import HiddenCell from "./HiddenCell";
 import { useDispatch } from "react-redux";
-import { selectEmptyCell } from "../../engine/gameSlice";
+import { selectEmptyCell } from "../../engine/minesweeperSlice";
 
 interface Props {
   columnIndex: number;

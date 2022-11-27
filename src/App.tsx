@@ -7,6 +7,7 @@ import { RootState } from "./store";
 
 function App() {
   const board = useSelector((state: RootState) => state.game.board);
+  const playState = useSelector((state: RootState) => state.game.gameState);
   const cells = board.flat();
 
   return (
@@ -14,6 +15,8 @@ function App() {
       css={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
       <h1>RM 3000</h1>
+
+      <p>Play State: {playState}</p>
 
       <Board>
         {cells.map((cell, index) => {
