@@ -10,12 +10,17 @@ body {
 html {
   box-sizing: border-box;
   font-size: 16px;
+  height: 100%;
 }
 
 *,
 *:before,
 *:after {
   box-sizing: inherit;
+}
+
+body {
+  height: 100%;
 }
 
 body,
@@ -41,4 +46,8 @@ ul {
 img {
   max-width: 100%;
   height: auto;
+}
+
+#root {
+  height: 100%;
 }

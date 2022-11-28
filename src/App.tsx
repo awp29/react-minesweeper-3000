@@ -6,7 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./store";
 import { selectNumberOfFlaggedCells } from "./engine/selectors";
 import { getDifficultyConfig } from "./engine/difficulty";
-import { selectDifficulty } from "./engine/minesweeperSlice";
+import { GameState, selectDifficulty } from "./engine/minesweeperSlice";
+import GameWonModal from "./components/modal/GameWonModal";
+import GameOverModal from "./components/modal/GameOverModal";
 
 function App() {
   const dispatch = useDispatch();
@@ -18,7 +20,7 @@ function App() {
   const maxNumberOfFlags = getDifficultyConfig(difficulty).flags;
 
   const board = useSelector((state: RootState) => state.minesweeper.board);
-  const playState = useSelector(
+  const gameState = useSelector(
     (state: RootState) => state.minesweeper.gameState
   );
   const flaggedCells = useSelector(selectNumberOfFlaggedCells);
@@ -27,25 +29,40 @@ function App() {
 
   return (
     <div
-      css={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      css={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "auto",
+        height: "100%",
+        maxWidth: "600px",
+        width: "100%",
+      }}
     >
-      <h1>RM 3000</h1>
-
-      <p>Play State: {playState}</p>
-      <p>Flags: {maxNumberOfFlags - flaggedCells}</p>
-
-      <select
-        name="difficulty"
-        id="difficulty"
-        onChange={(e) => {
-          const difficulty = e.target.value;
-          dispatch(selectDifficulty(parseInt(difficulty)));
+      <div
+        css={{
+          display: "flex",
+          justifyContent: "space-between",
+          margin: "20px 0",
+          width: "100%",
         }}
       >
-        <option value="0">Easy</option>
-        <option value="1">Medium</option>
-        <option value="2">Hard</option>
-      </select>
+        <select
+          name="difficulty"
+          id="difficulty"
+          onChange={(e) => {
+            const difficulty = e.target.value;
+            dispatch(selectDifficulty(parseInt(difficulty)));
+          }}
+        >
+          <option value="0">Easy</option>
+          <option value="1">Medium</option>
+          <option value="2">Hard</option>
+        </select>
+        <p>TIMER</p>
+        <p>Flags: {maxNumberOfFlags - flaggedCells}</p>
+      </div>
 
       <Board>
         {cells.map((cell, index) => {
@@ -61,6 +78,9 @@ function App() {
           }
         })}
       </Board>
+
+      {gameState === GameState.Won && <GameWonModal />}
+      {gameState === GameState.GameOver && <GameOverModal />}
     </div>
   );
 }

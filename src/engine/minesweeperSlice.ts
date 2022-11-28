@@ -8,7 +8,7 @@ interface CellIndex {
   rowIndex: number;
 }
 
-enum GameState {
+export enum GameState {
   Active = "Active",
   GameOver = "Game Over",
   Won = "Won",
@@ -30,6 +30,11 @@ export const minesweeperSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
+    newGame: (state) => {
+      state.board = generateBoard(state.difficulty);
+      state.gameState = GameState.Active;
+    },
+
     selectDifficulty: (state, action: PayloadAction<number>) => {
       const difficulty = action.payload;
       state.difficulty = difficulty;
@@ -64,6 +69,7 @@ export const minesweeperSlice = createSlice({
 });
 
 export const {
+  newGame,
   selectEmptyCell,
   selectMineCell,
   selectTouchingCell,
