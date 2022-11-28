@@ -79,8 +79,8 @@ function App() {
         })}
       </Board>
 
-      {gameState === GameState.Won && <GameWonModal />}
-      {gameState === GameState.GameOver && <GameOverModal />}
+      {/* {gameState === GameState.Won && <GameWonModal />}
+      {gameState === GameState.GameOver && <GameOverModal />} */}
     </div>
   );
 }

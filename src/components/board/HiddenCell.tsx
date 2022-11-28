@@ -3,6 +3,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { flagCell } from "../../engine/minesweeperSlice";
 import { RootState } from "../../store";
+import { AiFillFlag } from "react-icons/ai";
 
 interface Props {
   columnIndex: number;
@@ -37,7 +38,7 @@ const HiddenCell: React.FC<Props> = (props) => {
         dispatch(flagCell({ columnIndex, rowIndex }));
       }}
     >
-      {flagged && "F"}
+      {flagged && <AiFillFlag size={30} />}
     </div>
   );
 };

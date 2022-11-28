@@ -1,45 +1,36 @@
 /** @jsxImportSource @emotion/react */
 
-import HiddenCell from "./HiddenCell";
 import { useDispatch } from "react-redux";
 import { selectMineCell } from "../../engine/minesweeperSlice";
+import BaseCell, { BaseCellProps } from "./BaseCell";
+import { FaCog } from "react-icons/fa";
 
-interface Props {
-  columnIndex: number;
-  rowIndex: number;
-  visible: boolean;
-}
-
-const EmptyCell: React.FC<Props> = (props) => {
-  const { columnIndex, rowIndex, visible } = props;
+const EmptyCell: React.FC<BaseCellProps> = (props) => {
+  const { columnIndex, rowIndex } = props;
 
   const dispatch = useDispatch();
 
-  if (!visible) {
-    return (
-      <HiddenCell
-        columnIndex={columnIndex}
-        rowIndex={rowIndex}
-        onClick={() => {
-          dispatch(selectMineCell({ columnIndex, rowIndex }));
-        }}
-      />
-    );
-  }
-
   return (
-    <div
-      css={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-around",
-        background: "#D5D2CE",
-        borderRadius: "2px",
-        fontWeight: "bold",
+    <BaseCell
+      {...props}
+      onClick={() => {
+        dispatch(selectMineCell({ columnIndex, rowIndex }));
       }}
     >
-      M
-    </div>
+      <div
+        css={{
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#D7263D",
+          justifyContent: "space-around",
+          width: "80%",
+          height: "80%",
+          borderRadius: "8px",
+        }}
+      >
+        <FaCog size={30} />
+      </div>
+    </BaseCell>
   );
 };
 

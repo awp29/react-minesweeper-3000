@@ -1,42 +1,21 @@
 /** @jsxImportSource @emotion/react */
 
-import HiddenCell from "./HiddenCell";
 import { useDispatch } from "react-redux";
 import { selectEmptyCell } from "../../engine/minesweeperSlice";
+import BaseCell, { BaseCellProps } from "./BaseCell";
 
-interface Props {
-  columnIndex: number;
-  rowIndex: number;
-  visible: boolean;
-}
-
-const EmptyCell: React.FC<Props> = (props) => {
-  const { columnIndex, rowIndex, visible } = props;
+const EmptyCell: React.FC<BaseCellProps> = (props) => {
+  const { columnIndex, rowIndex } = props;
 
   const dispatch = useDispatch();
 
-  if (!visible) {
-    return (
-      <HiddenCell
-        columnIndex={columnIndex}
-        rowIndex={rowIndex}
-        onClick={() => {
-          dispatch(selectEmptyCell({ columnIndex, rowIndex }));
-        }}
-      />
-    );
-  }
-
   return (
-    <div
-      css={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-around",
-        background: "#D5D2CE",
-        borderRadius: "2px",
+    <BaseCell
+      {...props}
+      onClick={() => {
+        dispatch(selectEmptyCell({ columnIndex, rowIndex }));
       }}
-    ></div>
+    ></BaseCell>
   );
 };
 
