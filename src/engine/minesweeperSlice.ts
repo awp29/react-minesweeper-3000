@@ -29,9 +29,9 @@ export interface MinesweeperState {
 }
 
 const initialGameSettings = {
-  columns: 20,
-  rows: 20,
-  bombs: 50,
+  columns: 10,
+  rows: 10,
+  bombs: 10,
 };
 
 const initialState: MinesweeperState = {
@@ -55,6 +55,8 @@ export const minesweeperSlice = createSlice({
       });
       state.gameState = GameState.Active;
       state.moves = 0;
+
+      window.document.title = "RMS 😀😀😀😀😀😀";
     },
 
     selectEmptyCell: (state, action: PayloadAction<CellIndex>) => {
@@ -78,6 +80,8 @@ export const minesweeperSlice = createSlice({
       const { columnIndex, rowIndex } = action.payload;
       state.board[columnIndex][rowIndex].visible = true;
       state.gameState = GameState.GameOver;
+
+      window.document.title = "RMS 🤯💣🤯💣🤯💣";
     },
 
     flagCell: (state, action: PayloadAction<CellIndex>) => {
@@ -94,6 +98,8 @@ export const minesweeperSlice = createSlice({
       state.gameState = GameState.Active;
       state.moves = 0;
       state.board = generateBoard({ rows, columns, bombs });
+
+      window.document.title = "RMS 😀😀😀😀😀😀";
     },
   },
 });

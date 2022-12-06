@@ -9,6 +9,7 @@ import NewGameButton from "./components/NewGameButton";
 import { GameStats, Stat, StatContainer, StatTitle } from "./components/stats";
 import { useState } from "react";
 import GameSettings from "./GameSettings";
+import GameSettingsButton from "./components/SettingsButton";
 
 function App() {
   const [showSettings, setShowSettings] = useState(false);
@@ -47,14 +48,11 @@ function App() {
               borderRadius: "8px",
             }}
           >
-            <button
-              css={{ position: "absolute", right: "-40px", top: "-6px" }}
+            <GameSettingsButton
               onClick={() => {
                 setShowSettings(true);
               }}
-            >
-              SETTINGS
-            </button>
+            />
 
             <NewGameButton css={{ marginBottom: "20px" }} />
 

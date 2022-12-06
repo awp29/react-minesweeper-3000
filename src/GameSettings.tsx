@@ -2,6 +2,8 @@
 
 import { ChangeEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Field, Input, Label } from "./components/form";
+import RestartGameButton from "./components/RestartGameButton";
 import { updateGameSettings } from "./engine/minesweeperSlice";
 import { selectGameSettings } from "./engine/selectors";
 
@@ -41,38 +43,56 @@ const GameSettings: React.FC<Props> = (props) => {
           onRestartGame();
         }}
       >
-        <div css={{ display: "flex" }}>
-          <input
-            css={{ width: "47%" }}
-            value={rows}
-            type="number"
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              setRows(parseInt(e.target.value));
-            }}
-          />
+        <div
+          css={{ display: "flex", alignItems: "center", marginBottom: "16px" }}
+        >
+          <Field css={{ width: "45%" }}>
+            <Label>Rows</Label>
+            <Input
+              value={rows}
+              type="number"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setRows(parseInt(e.target.value));
+              }}
+            />
+          </Field>
 
-          <span css={{ flex: 1, textAlign: "center" }}>x</span>
-
-          <input
-            css={{ width: "47%" }}
-            value={columns}
-            type="number"
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              setColumns(parseInt(e.target.value));
+          <span
+            css={{
+              position: "relative",
+              top: "8px",
+              flex: 1,
+              textAlign: "center",
+              color: "#bcbcbc",
             }}
-          />
+          >
+            x
+          </span>
+
+          <Field css={{ width: "45%" }}>
+            <Label>Columns</Label>
+            <Input
+              value={columns}
+              type="number"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setColumns(parseInt(e.target.value));
+              }}
+            />
+          </Field>
         </div>
 
-        <input
-          css={{ width: "100%" }}
-          value={bombs}
-          type="number"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setBombs(parseInt(e.target.value));
-          }}
-        />
+        <Field css={{ marginBottom: "28px" }}>
+          <Label>Bombs</Label>
+          <Input
+            value={bombs}
+            type="number"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              setBombs(parseInt(e.target.value));
+            }}
+          />
+        </Field>
 
-        <button type="submit">Restart Game</button>
+        <RestartGameButton />
       </form>
     </div>
   );
