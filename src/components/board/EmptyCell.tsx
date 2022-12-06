@@ -11,11 +11,14 @@ const EmptyCell: React.FC<BaseCellProps> = (props) => {
 
   return (
     <BaseCell
+      css={{ backgroundColor: "white" }}
       {...props}
       onClick={() => {
         dispatch(selectEmptyCell({ columnIndex, rowIndex }));
       }}
-    ></BaseCell>
+    >
+      👍
+    </BaseCell>
   );
 };
 

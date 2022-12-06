@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useSelector } from "react-redux";
-import { getDifficultyConfig } from "../../engine/difficulty";
 import { RootState } from "../../store";
 
 interface Props {
@@ -12,22 +11,21 @@ interface Props {
 const Board: React.FC<Props> = (props) => {
   const { children } = props;
 
-  const difficulty = useSelector(
-    (state: RootState) => state.minesweeper.difficulty
-  );
-
-  const difficultyConfig = getDifficultyConfig(difficulty);
+  const boardSize = useSelector((state: RootState) => {
+    return {
+      columns: state.minesweeper.columns,
+      rows: state.minesweeper.rows,
+    };
+  });
 
   return (
     <div
       css={{
         display: "grid",
-        gridTemplateColumns: `repeat(${difficultyConfig.maxColumns}, 1fr)`,
-        gridTemplateRows: `repeat(${difficultyConfig.maxRows}, 1fr)`,
-        columnGap: "2px",
-        rowGap: "2px",
-        width: "600px",
-        height: "600px",
+        gridTemplateColumns: `repeat(${boardSize.columns}, 1fr)`,
+        gridTemplateRows: `repeat(${boardSize.rows}, 1fr)`,
+        columnGap: "10px",
+        width: "fit-content",
       }}
     >
       {children}

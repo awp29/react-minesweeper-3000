@@ -1,7 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Board, Cell, CellType, generateBoard } from "./generateBoard";
+import {
+  Board,
+  Cell,
+  CellType,
+  GameSettings,
+  generateBoard,
+} from "./generateBoard";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { Difficulty, getDifficultyConfig } from "./difficulty";
 
 interface CellIndex {
   columnIndex: number;
@@ -17,13 +22,25 @@ export enum GameState {
 export interface MinesweeperState {
   board: Board;
   gameState: GameState;
-  difficulty: Difficulty;
+  moves: number;
+  rows: number;
+  columns: number;
+  bombs: number;
 }
 
+const initialGameSettings = {
+  columns: 20,
+  rows: 20,
+  bombs: 50,
+};
+
 const initialState: MinesweeperState = {
-  board: generateBoard(Difficulty.Easy),
+  board: generateBoard(initialGameSettings),
   gameState: GameState.Active,
-  difficulty: Difficulty.Easy,
+  moves: 0,
+  rows: initialGameSettings.rows,
+  columns: initialGameSettings.columns,
+  bombs: initialGameSettings.bombs,
 };
 
 export const minesweeperSlice = createSlice({
@@ -31,27 +48,30 @@ export const minesweeperSlice = createSlice({
   initialState,
   reducers: {
     newGame: (state) => {
-      state.board = generateBoard(state.difficulty);
+      state.board = generateBoard({
+        rows: state.rows,
+        columns: state.columns,
+        bombs: state.bombs,
+      });
       state.gameState = GameState.Active;
-    },
-
-    selectDifficulty: (state, action: PayloadAction<number>) => {
-      const difficulty = action.payload;
-      state.difficulty = difficulty;
-      state.board = generateBoard(difficulty);
-      state.gameState = GameState.Active;
+      state.moves = 0;
     },
 
     selectEmptyCell: (state, action: PayloadAction<CellIndex>) => {
       const { columnIndex, rowIndex } = action.payload;
-      revealEmptyCells(columnIndex, rowIndex, state.board, state.difficulty);
+      revealEmptyCells(columnIndex, rowIndex, state.board, {
+        columns: state.columns,
+        rows: state.rows,
+      });
       state.gameState = updateGameState(state.board);
+      state.moves++;
     },
 
     selectTouchingCell: (state, action: PayloadAction<CellIndex>) => {
       const { columnIndex, rowIndex } = action.payload;
       state.board[columnIndex][rowIndex].visible = true;
       state.gameState = updateGameState(state.board);
+      state.moves++;
     },
 
     selectMineCell: (state, action: PayloadAction<CellIndex>) => {
@@ -65,6 +85,16 @@ export const minesweeperSlice = createSlice({
       const cell = state.board[columnIndex][rowIndex];
       cell.flagged = !cell.flagged;
     },
+
+    updateGameSettings: (state, action: PayloadAction<GameSettings>) => {
+      const { rows, columns, bombs } = action.payload;
+      state.rows = rows;
+      state.columns = columns;
+      state.bombs = bombs;
+      state.gameState = GameState.Active;
+      state.moves = 0;
+      state.board = generateBoard({ rows, columns, bombs });
+    },
   },
 });
 
@@ -74,7 +104,7 @@ export const {
   selectMineCell,
   selectTouchingCell,
   flagCell,
-  selectDifficulty,
+  updateGameSettings,
 } = minesweeperSlice.actions;
 
 export default minesweeperSlice.reducer;
@@ -83,15 +113,13 @@ function revealEmptyCells(
   columnIndex: number,
   rowIndex: number,
   board: Board,
-  difficulty: Difficulty
+  boardSize: { columns: number; rows: number }
 ) {
-  const difficultyConfig = getDifficultyConfig(difficulty);
-
-  if (columnIndex < 0 || columnIndex >= difficultyConfig.maxColumns) {
+  if (columnIndex < 0 || columnIndex >= boardSize.columns) {
     return;
   }
 
-  if (rowIndex < 0 || rowIndex >= difficultyConfig.maxRows) {
+  if (rowIndex < 0 || rowIndex >= boardSize.rows) {
     return;
   }
 
@@ -112,18 +140,18 @@ function revealEmptyCells(
   cell.visible = true;
 
   // check cells above
-  revealEmptyCells(columnIndex - 1, rowIndex - 1, board, difficulty);
-  revealEmptyCells(columnIndex, rowIndex - 1, board, difficulty);
-  revealEmptyCells(columnIndex + 1, rowIndex - 1, board, difficulty);
+  revealEmptyCells(columnIndex - 1, rowIndex - 1, board, boardSize);
+  revealEmptyCells(columnIndex, rowIndex - 1, board, boardSize);
+  revealEmptyCells(columnIndex + 1, rowIndex - 1, board, boardSize);
 
   // check middle cells
-  revealEmptyCells(columnIndex - 1, rowIndex, board, difficulty);
-  revealEmptyCells(columnIndex + 1, rowIndex, board, difficulty);
+  revealEmptyCells(columnIndex - 1, rowIndex, board, boardSize);
+  revealEmptyCells(columnIndex + 1, rowIndex, board, boardSize);
 
   // check cells below
-  revealEmptyCells(columnIndex - 1, rowIndex + 1, board, difficulty);
-  revealEmptyCells(columnIndex, rowIndex + 1, board, difficulty);
-  revealEmptyCells(columnIndex + 1, rowIndex + 1, board, difficulty);
+  revealEmptyCells(columnIndex - 1, rowIndex + 1, board, boardSize);
+  revealEmptyCells(columnIndex, rowIndex + 1, board, boardSize);
+  revealEmptyCells(columnIndex + 1, rowIndex + 1, board, boardSize);
 }
 
 function updateGameState(board: Board) {

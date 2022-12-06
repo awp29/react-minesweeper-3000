@@ -3,7 +3,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { flagCell } from "../../engine/minesweeperSlice";
 import { RootState } from "../../store";
-import { AiFillFlag } from "react-icons/ai";
 
 interface Props {
   columnIndex: number;
@@ -22,23 +21,14 @@ const HiddenCell: React.FC<Props> = (props) => {
 
   return (
     <div
-      css={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-around",
-        backgroundColor: "#424242",
-        borderRadius: "2px",
-        color: "white",
-        fontWeight: "bold",
-      }}
+      css={{ cursor: "pointer", fontSize: "20px" }}
       onClick={onClick}
       onContextMenu={(e) => {
         e.preventDefault();
-
         dispatch(flagCell({ columnIndex, rowIndex }));
       }}
     >
-      {flagged && <AiFillFlag size={30} />}
+      {flagged ? "🚧" : "⬜"}
     </div>
   );
 };

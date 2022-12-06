@@ -4,6 +4,7 @@ import { darken } from "polished";
 import HiddenCell from "./HiddenCell";
 
 export interface BaseCellProps {
+  className?: string;
   columnIndex: number;
   rowIndex: number;
   visible: boolean;
@@ -15,9 +16,8 @@ interface Props extends BaseCellProps {
 }
 
 const BaseCell: React.FC<Props> = (props) => {
-  const { columnIndex, rowIndex, visible, children, onClick } = props;
-
-  const evenCell = (columnIndex + rowIndex) % 2 === 0;
+  const { className, columnIndex, rowIndex, visible, children, onClick } =
+    props;
 
   if (!visible) {
     return (
@@ -31,13 +31,9 @@ const BaseCell: React.FC<Props> = (props) => {
 
   return (
     <div
+      className={className}
       css={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-around",
-        backgroundColor: evenCell ? "#EBE8E5" : darken(0.1, "#EBE8E5"),
-        borderRadius: "4px",
-        fontWeight: "bold",
+        fontSize: "20px",
       }}
     >
       {children}

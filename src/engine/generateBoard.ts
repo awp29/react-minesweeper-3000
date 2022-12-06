@@ -1,5 +1,10 @@
 import { cloneDeep } from "lodash";
-import { Difficulty, getDifficultyConfig } from "./difficulty";
+
+export interface GameSettings {
+  rows: number;
+  columns: number;
+  bombs: number;
+}
 
 export enum CellType {
   Empty,
@@ -30,22 +35,21 @@ interface TouchingCell extends BaseCell {
 export type Cell = EmptyCell | MineCell | TouchingCell;
 export type Board = Cell[][];
 
-export const generateBoard = (difficulty: Difficulty) => {
-  const emptyBoard: Board = generateEmptyBoard(difficulty);
-  const boardWithMines = placeMines(emptyBoard, difficulty);
-  const board = calculateTouchingCells(boardWithMines, difficulty);
+export const generateBoard = (gameSettings: GameSettings) => {
+  const emptyBoard: Board = generateEmptyBoard(gameSettings);
+  const boardWithMines = placeMines(emptyBoard, gameSettings);
+  const board = calculateTouchingCells(boardWithMines, gameSettings);
 
   return board;
 };
 
-function generateEmptyBoard(difficulty: Difficulty) {
-  const difficultyConfig = getDifficultyConfig(difficulty);
+function generateEmptyBoard(gameSettings: GameSettings) {
   const emptyBoard: Board = [];
 
-  for (let i = 0; i < difficultyConfig.maxColumns; i++) {
+  for (let i = 0; i < gameSettings.columns; i++) {
     const row: Cell[] = [];
 
-    for (let j = 0; j < difficultyConfig.maxRows; j++) {
+    for (let j = 0; j < gameSettings.rows; j++) {
       row.push({
         columnIndex: i,
         rowIndex: j,
@@ -60,20 +64,20 @@ function generateEmptyBoard(difficulty: Difficulty) {
   return emptyBoard;
 }
 
-function placeMines(emptyBoard: Board, difficulty: Difficulty) {
-  const difficultyConfig = getDifficultyConfig(difficulty);
+function placeMines(emptyBoard: Board, gameSettings: GameSettings) {
   const board = cloneDeep(emptyBoard);
 
-  let remainingMines = difficultyConfig.maxMines;
+  // TODO: RENAME BOMBS TO MINES
+  let remainingMines = gameSettings.bombs;
   while (remainingMines > 0) {
-    let randomCellIndex = getRandomCellIndex(difficulty);
+    let randomCellIndex = getRandomCellIndex(gameSettings);
 
     if (
       isMine(
         randomCellIndex.colIndex,
         randomCellIndex.rowIndex,
         board,
-        difficulty
+        gameSettings
       )
     ) {
       continue;
@@ -88,39 +92,39 @@ function placeMines(emptyBoard: Board, difficulty: Difficulty) {
   return board;
 }
 
-function getRandomCellIndex(difficulty: Difficulty) {
-  const difficultyConfig = getDifficultyConfig(difficulty);
-
+function getRandomCellIndex(gameSettings: GameSettings) {
   return {
-    colIndex: Math.floor(Math.random() * difficultyConfig.maxColumns),
-    rowIndex: Math.floor(Math.random() * difficultyConfig.maxRows),
+    colIndex: Math.floor(Math.random() * gameSettings.columns),
+    rowIndex: Math.floor(Math.random() * gameSettings.rows),
   };
 }
 
-function calculateTouchingCells(boardWithMines: Board, difficulty: Difficulty) {
-  const difficultyConfig = getDifficultyConfig(difficulty);
+function calculateTouchingCells(
+  boardWithMines: Board,
+  gameSettings: GameSettings
+) {
   const board = cloneDeep(boardWithMines);
 
-  for (let i = 0; i < difficultyConfig.maxColumns; i++) {
-    for (let j = 0; j < difficultyConfig.maxRows; j++) {
-      if (isMine(i, j, board, difficulty)) {
+  for (let i = 0; i < gameSettings.columns; i++) {
+    for (let j = 0; j < gameSettings.rows; j++) {
+      if (isMine(i, j, board, gameSettings)) {
         continue;
       }
 
       let touching = 0;
       // check cells above
-      if (isMine(i - 1, j - 1, board, difficulty)) touching++;
-      if (isMine(i, j - 1, board, difficulty)) touching++;
-      if (isMine(i + 1, j - 1, board, difficulty)) touching++;
+      if (isMine(i - 1, j - 1, board, gameSettings)) touching++;
+      if (isMine(i, j - 1, board, gameSettings)) touching++;
+      if (isMine(i + 1, j - 1, board, gameSettings)) touching++;
 
       // check cells adjacent
-      if (isMine(i - 1, j, board, difficulty)) touching++;
-      if (isMine(i + 1, j, board, difficulty)) touching++;
+      if (isMine(i - 1, j, board, gameSettings)) touching++;
+      if (isMine(i + 1, j, board, gameSettings)) touching++;
 
       // check cells below
-      if (isMine(i - 1, j + 1, board, difficulty)) touching++;
-      if (isMine(i, j + 1, board, difficulty)) touching++;
-      if (isMine(i + 1, j + 1, board, difficulty)) touching++;
+      if (isMine(i - 1, j + 1, board, gameSettings)) touching++;
+      if (isMine(i, j + 1, board, gameSettings)) touching++;
+      if (isMine(i + 1, j + 1, board, gameSettings)) touching++;
 
       if (touching > 0) {
         const cell = board[i][j];
@@ -141,15 +145,13 @@ function isMine(
   colIndex: number,
   rowIndex: number,
   board: Board,
-  difficulty: Difficulty
+  gameSettings: GameSettings
 ) {
-  const difficultyConfig = getDifficultyConfig(difficulty);
-
-  if (colIndex < 0 || colIndex >= difficultyConfig.maxColumns) {
+  if (colIndex < 0 || colIndex >= gameSettings.columns) {
     return false;
   }
 
-  if (rowIndex < 0 || rowIndex >= difficultyConfig.maxRows) {
+  if (rowIndex < 0 || rowIndex >= gameSettings.rows) {
     return false;
   }
 
